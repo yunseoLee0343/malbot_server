@@ -22,7 +22,7 @@ app.post('/register-token', async (req, res) => {
     .doc(userId)
     .collection('deviceTokens')
     .doc(token)
-    .set({ token, createdAt: admin.firestore.Timestamp.now() });
+    .set({ token, createdAt: admin.firestore.Timestamp.now() }, { merge: true });
 
   res.json({ message: '토큰 등록 완료' });
 });
