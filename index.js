@@ -6,7 +6,9 @@ import serviceAccount from './serviceAccountKey.json' assert { type: 'json' };
 // Firebase Admin 초기화
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
+  projectId: serviceAccount.project_id,
 });
+console.log(`project id is ${serviceAccount.project_id}.`)
 const db = admin.firestore();
 const app = express();
 app.use(express.json());
@@ -41,11 +43,10 @@ schedule.scheduleJob('*/1 * * * *', async () => {
     if (!tokens.length) continue;
 
     const message = {
-      notification: { title: '1분 알림 테스트', body: '매 분마다 푸시가 옵니다.' },
-      tokens,
+      notification: { title: '테스트', body: '단일 푸시입니다.' },
+      token: tokens[0],
     };
-    const resp = await admin.messaging().sendMulticast(message);
-    console.log(`${userId}: ${resp.successCount} 성공, ${resp.failureCount} 실패`);
+    await admin.messaging().send(message);
   }
 });
 
