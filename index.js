@@ -46,7 +46,22 @@ schedule.scheduleJob('*/1 * * * *', async () => {
       notification: { title: '테스트', body: '단일 푸시입니다.' },
       token: tokens[0],
     };
-    await admin.messaging().send(message);
+
+    try {
+      await admin.messaging().send(message);
+    } catch (error) {
+      console.error(`Error sending to token (${tokens[0]}):`, error.message);
+
+      if (error.code === 'messaging/registration-token-not-registered') {
+        console.log(`삭제 중: ${tokens[0]}`);
+        await db
+          .collection('users')
+          .doc(userId)
+          .collection('deviceTokens')
+          .doc(tokens[0])
+          .delete();
+      }
+    }
   }
 });
 
